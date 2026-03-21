@@ -7,66 +7,182 @@ export default function handler(req, res) {
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Spotify Setup</title>
+
 <style>
-:root { color-scheme: light dark; }
+:root {
+    --bg: #0f0f0f;
+    --card: #181818;
+    --text: #ffffff;
+    --muted: #b3b3b3;
+    --accent: #1db954;
+    --border: #2a2a2a;
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg: #f5f5f5;
+        --card: #ffffff;
+        --text: #111;
+        --muted: #666;
+        --border: #ddd;
+    }
+}
+
+* {
+    box-sizing: border-box;
+}
+
 body {
-    font-family: system-ui;
+    margin: 0;
+    font-family: system-ui, -apple-system;
+    background: var(--bg);
+    color: var(--text);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
+    padding: 20px;
 }
+
 .container {
-    width: 90%;
-    max-width: 600px;
+    width: 100%;
+    max-width: 520px;
 }
+
+.card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+}
+
+h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+label {
+    font-size: 13px;
+    color: var(--muted);
+}
+
 input {
     width: 100%;
-    padding: 10px;
-    margin: 8px 0;
+    padding: 12px;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    outline: none;
+    transition: 0.2s;
 }
-.box {
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 8px;
-    word-break: break-all;
+
+input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(29,185,84,0.2);
 }
+
 button {
-    padding: 10px;
-    margin-top: 5px;
     width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.section {
+    margin-top: 20px;
+}
+
+.box {
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--border);
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    word-break: break-all;
+    margin-top: 6px;
+}
+
+.copy-btn {
+    margin-top: 8px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+
+.copy-btn:hover {
+    border-color: var(--accent);
+}
+
+.success {
+    color: var(--accent);
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.hidden {
+    display: none;
 }
 </style>
 </head>
+
 <body>
+
 <div class="container">
+<div class="card">
 
 <h2>Spotify Sync Setup</h2>
 
-<h4>Client ID</h4>
+<label>Client ID</label>
 <input id="id" placeholder="Enter your client_id">
 
-<h4>Client Secret</h4>
+<label>Client Secret</label>
 <input id="secret" placeholder="Enter your client_secret">
 
 <button onclick="generate()">Generate Links</button>
 
-<div id="output" style="display:none;">
+<div id="output" class="hidden">
 
-<h4>Redirect URI (put in Spotify app)</h4>
+<div class="section">
+<label>Redirect URI (add this to Spotify)</label>
 <div class="box" id="redirect">${redirect}</div>
-<button onclick="copy('redirect')">Copy</button>
+<button class="copy-btn" onclick="copy('redirect', this)">Copy</button>
+<div class="success hidden">✔ Copied</div>
+</div>
 
-<h4>Authorization URL</h4>
+<div class="section">
+<label>Authorization URL</label>
 <div class="box" id="auth"></div>
-<button onclick="copy('auth')">Copy</button>
+<button class="copy-btn" onclick="copy('auth', this)">Copy</button>
+<div class="success hidden">✔ Copied</div>
+</div>
 
-<h4>Refresh URL (after getting refresh_token)</h4>
+<div class="section">
+<label>Refresh URL</label>
 <div class="box" id="refresh"></div>
-<button onclick="copy('refresh')">Copy</button>
+<button class="copy-btn" onclick="copy('refresh', this)">Copy</button>
+<div class="success hidden">✔ Copied</div>
+</div>
 
 </div>
 
+</div>
 </div>
 
 <script>
@@ -75,7 +191,7 @@ function generate(){
     const secret = document.getElementById("secret").value.trim()
 
     if(!id || !secret){
-        alert("Please fill both fields")
+        alert("Fill both fields")
         return
     }
 
@@ -96,11 +212,19 @@ function generate(){
     document.getElementById("auth").innerText = auth
     document.getElementById("refresh").innerText = refresh
 
-    document.getElementById("output").style.display = "block"
+    document.getElementById("output").classList.remove("hidden")
 }
 
-function copy(id){
-    navigator.clipboard.writeText(document.getElementById(id).innerText)
+function copy(id, btn){
+    const text = document.getElementById(id).innerText
+    navigator.clipboard.writeText(text)
+
+    const success = btn.nextElementSibling
+    success.classList.remove("hidden")
+
+    setTimeout(() => {
+        success.classList.add("hidden")
+    }, 1500)
 }
 </script>
 
