@@ -1,5 +1,5 @@
 export default function handler(req, res) {
-    const redirect = "https://key-system-jay-devs.vercel.app/sync"
+    const redirect = "https://spotify-sync-lyrics.vercel.app/sync"
 
     const html = `
 <!DOCTYPE html>
