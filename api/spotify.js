@@ -35,7 +35,7 @@ export default async function handler(req, res) {
                 body: new URLSearchParams({
                     grant_type: "authorization_code",
                     code: code,
-                    redirect_uri: "https://key-system-jay-devs.vercel.app/callback"
+                    redirect_uri: "https://spotify-sync-lyrics.vercel.app/sync"
                 })
             })
 
