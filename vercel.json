@@ -5,6 +5,7 @@
   ],
   "routes": [
     { "src": "/sync", "dest": "/api/spotify.js" },
-    { "src": "/generate", "dest": "/api/generate.js" }
+    { "src": "/generate", "dest": "/api/generate.js" },
+    { "src": "/avatar", "dest": "/api/avatar.js" }
   ]
 }
