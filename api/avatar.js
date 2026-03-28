@@ -28,14 +28,30 @@ export default async function handler(req, res) {
             });
         }
 
-        const result = data.data[0];
+        const imageUrl = data.data[0].imageUrl;
 
-        return res.status(200).json({
-            success: true,
-            userId,
-            imageUrl: result.imageUrl,
-            state: result.state
-        });
+        if (!imageUrl) {
+            return res.status(404).json({
+                success: false,
+                error: "Image not ready"
+            });
+        }
+
+        const imageRes = await fetch(imageUrl);
+
+        if (!imageRes.ok) {
+            return res.status(502).json({
+                success: false,
+                error: "Failed to fetch image"
+            });
+        }
+
+        res.setHeader("Content-Type", imageRes.headers.get("content-type") || "image/png");
+
+        res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate");
+
+        const buffer = await imageRes.arrayBuffer();
+        return res.status(200).send(Buffer.from(buffer));
 
     } catch (err) {
         return res.status(500).json({
