@@ -1,5 +1,6 @@
 export default async function handler(req, res) {
     try {
+        // CORS
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
         res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -8,7 +9,7 @@ export default async function handler(req, res) {
             return res.status(200).end();
         }
 
-        const { userId } = req.query;
+        const { userId, imgType = "headshot" } = req.query;
 
         if (!userId) {
             return res.status(400).json({
@@ -17,7 +18,14 @@ export default async function handler(req, res) {
             });
         }
 
-        const url = `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${encodeURIComponent(userId)}&size=420x420&format=Png`;
+        // ✅ exact URLs as requested
+        let url;
+
+        if (imgType === "fullbody") {
+            url = `https://thumbnails.roblox.com/v1/users/avatar?userIds=${userId}&size=720x720&format=Png`;
+        } else {
+            url = `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${encodeURIComponent(userId)}&size=420x420&format=Png`;
+        }
 
         const response = await fetch(url);
         const data = await response.json();
@@ -32,7 +40,7 @@ export default async function handler(req, res) {
         if (!data?.data || data.data.length === 0) {
             return res.status(404).json({
                 success: false,
-                error: "No avatar found"
+                error: "No image found"
             });
         }
 
@@ -41,7 +49,7 @@ export default async function handler(req, res) {
         if (!imageUrl) {
             return res.status(404).json({
                 success: false,
-                error: "Image not ready"
+                error: "Image not ready (Pending)"
             });
         }
 
@@ -54,7 +62,11 @@ export default async function handler(req, res) {
             });
         }
 
-        res.setHeader("Content-Type", imageRes.headers.get("content-type") || "image/png");
+        res.setHeader(
+            "Content-Type",
+            imageRes.headers.get("content-type") || "image/png"
+        );
+
         res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate");
 
         const buffer = await imageRes.arrayBuffer();
