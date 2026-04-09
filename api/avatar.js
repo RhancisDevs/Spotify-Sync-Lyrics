@@ -18,12 +18,16 @@ export default async function handler(req, res) {
             });
         }
 
-        // ✅ exact URLs as requested
         let url;
 
+        // ✅ modes
         if (imgType === "fullbody") {
             url = `https://thumbnails.roblox.com/v1/users/avatar?userIds=${userId}&size=720x720&format=Png`;
-        } else {
+        } 
+        else if (imgType === "fullAvatar") {
+            url = `https://thumbnails.roblox.com/v1/users/avatar?userIds=${userId}&size=352x352&format=Png&isCircular=false`;
+        } 
+        else {
             url = `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${encodeURIComponent(userId)}&size=420x420&format=Png`;
         }
 
